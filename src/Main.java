@@ -3,32 +3,38 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        String str = scanner.nextLine();
-        int res = 0;
-        int numberStart = -1;
-        int numberEnd = -1;
-        for (int i = 0; i<str.length(); i++) {
-            if (str.charAt(i) >= 48 && str.charAt(i) <= 57) {
-                if (numberStart == -1) {
-                    numberStart = i;
+        String input = scanner.nextLine();
+        String[] inputArray = input.split(" ");
+        Stack stack = new Stack();
+        for (int i = 0; i < inputArray.length; i++) {
+            if (inputArray[i].charAt(0) != '+' && inputArray[i].charAt(0) != '-' && inputArray[i].charAt(0) != '*') {
+                stack.add(new StackNode(getNumber(inputArray[i])));
+            } else {
+                if (stack.getSize() < 2) {
+                    throw new IllegalArgumentException("Error");
+                } else {
+                    int a = stack.getRoot().getValue();
+                    int b = stack.getRoot().getPrevious().getValue();
+                    if (inputArray[i].charAt(0) == '+') {
+                        stack.remove();
+                        stack.remove();
+                        stack.add(new StackNode(a + b, stack.getRoot()));
+                    } else if (inputArray[i].charAt(0) == '-') {
+                        stack.remove();
+                        stack.remove();
+                        stack.add(new StackNode(a - b, stack.getRoot()));
+                    } else if (inputArray[i].charAt(0) == '*') {
+                        stack.remove();
+                        stack.remove();
+                        stack.add(new StackNode(a * b, stack.getRoot()));
+                    }
                 }
-                numberEnd = i;
-                int num = str.charAt(i) - 48;
-                res = res * 10 + num;
-            } else if (numberStart != -1) {
-                break;
             }
         }
-        int len = String.valueOf(res).length();
-        String newString;
-        if (numberStart != -1) {
-            for (int i = 0; i < str.length() - len + 1; i++) {
-                newString += i;
-                if (str.charAt(i) == numberStart) {
-                    newString += res;
-                    i = len;
-                }
-            }
-        }
+        System.out.println(stack.getRoot().getValue());
+    }
+
+    public static int getNumber(String input) {
+        return Integer.parseInt(input);
     }
 }
